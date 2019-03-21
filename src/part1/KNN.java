@@ -6,22 +6,29 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Scanner;
 
-/*
- * Name: Karu Skipper
+/**
+ * @author Karu Skipper
  * Student ID:300417869
+ *
  */
-
-/* k-Nearest Neighbour algorithm 'KNN'*/
 
 public class KNN {
 	
-	private int k = 1; // nearest 1 neighbours (for now)
+	private int k = 3; 
 	private ArrayList<Flower> trainingList = new ArrayList<Flower>();
 	private ArrayList<Flower> testingList = new ArrayList<Flower>();
+	private ArrayList<String> predictionList = new ArrayList<String>();
+
 	
-	/* This is where I parse through the information from text document
+	/**
+	 * This is where I parse through the information from text document
 	 * for it to be stored within an array of flowers.
+	 * @param file to be scanned
+	 * @return list of flowers
+	 * @throws FileNotFoundException
 	 */
+	
+	@SuppressWarnings("resource")
 	private ArrayList<Flower> load(File arg) throws FileNotFoundException {
 		
 		ArrayList<Flower> flowers = new ArrayList<Flower>();
@@ -35,59 +42,79 @@ public class KNN {
 			String name = scanner.next();
 			flowers.add(new Flower(sepalLength,sepalWidth,petalLength,petalWidth,name));
 		}
-		
 		return flowers;
 	}
-	/*
-	Your program should take two file names as command line arguments, 
-	and classify each instance in the test set (the second file name) 
-	according to the training set (the first file name).
-	*/
+	
+	/**
+	 * Your program should take two file names as command line arguments, 
+	 * and classify each instance in the test set (the second file name) 
+	 * according to the training set (the first file name).
+	 * @param training
+	 * @param test
+	 * @throws FileNotFoundException
+	 */
 	
 	private void arguments(String training, String test) throws FileNotFoundException {
-		
 		this.testingList = load(new File(test));
 		this.trainingList = load(new File(training));
 		
+		for (int i = 0; i < testingList.size(); i++) {
+			Flower[] neighbours = getNeighbours(testingList.get(i), k);
+			String result = getResponses(neighbours);
+			this.predictionList.add(result);
+		}
 	}
-	/*
+
+	private String getResponses(Flower[] neighbours) {
+		return null;
+	}
+
+	private Flower[] getNeighbours(Flower flower, int k) {
+		return null;
+	}
+
+	/**
 	 * This finds the distance between 2 points, so we can compare them
-	 * Returns the euclideanDistance from first flower to second
-	 * 
+	 * @param first flower
+	 * @param second flower
+	 * @param range
+	 * @return euclideanDistance from first flower to second
 	 * 
 	 */
-	private double EuclideanDistance(Flower first, Flower second) {
+	private double EuclideanDistance(Flower first, Flower second, double range) {
 		double dist = 0;
-		// use euclidean alg
+		for (int i = 0; i < range; i++) {
+			dist += Math.pow((first.getMeasure()[i] - second.getMeasure()[i]), 2) / this.getRange(i);
+		}
 		return Math.sqrt(dist);
-		
 	}
-	public static class Result {
-		public double distance;
-		public Flower flower;
-		public Result(double distance, Flower flower) {
-			this.distance = distance;
-			this.flower = flower;
-		}
-		public double getDistance() {
-			return distance;
-		}
-	}
-	public static class DistanceComparator<Result> implements Comparator<Result>{
-		public double distance;
-		public Flower flower;
+
+	/**
+	 * @param i
+	 * @return range to be used in euclidean alg
+	 */
+	
+	private double getRange(int i) {
+		double max = 0;
+		double min = 1000;
 		
-		public DistanceComparator(double distance, Flower flower) {
-			this.distance = distance;
-			this.flower = flower;
+		for (Flower flower : trainingList) {
+			if (max < flower.getMeasure()[i]) {
+				max = flower.getMeasure()[i];
+			}
+			else if (min > flower.getMeasure()[i]) {
+				min = flower.getMeasure()[i];
+			}
 		}
-		@Override
-		public int compare(Result o1, Result b) {
-			return 1;
-		}
+		return max - min;
 	}
 	
-	public static void main(String []args) {
-		new KNN();
+	
+	/**
+	 * @param args
+	 * @throws FileNotFoundException 
+	 */
+	public static void main(String []args) throws FileNotFoundException {
+		new KNN().arguments(args[0], args[1]);
 	}
 }

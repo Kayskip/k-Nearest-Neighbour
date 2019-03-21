@@ -5,6 +5,10 @@ package part1;
  * Student ID:300417869
  */
 
+/**
+ * @author karu
+ *
+ */
 public class Flower {
 	
 	/* There are four numeric attributes: sepal length in cm, sepal
@@ -13,21 +17,47 @@ public class Flower {
 	 * which has been parsed in load method in the KNN class
 	 */
 	
-	private double sepalLength;
-	private double sepalWidth;
-	private double petalLength;
-	private double petalWidth;
+	private double[] measure = new double[4];
 	private String name;
+	
 	
 	/* What I will do is create these flower objects and store them in an array with 
 	 * the parsed information of the scanner in the KNN class
 	 */
 	
+	/**
+	 * @param sepalL
+	 * @param sepalW
+	 * @param petalL
+	 * @param petalW
+	 * @param name
+	 */
 	public Flower(double sepalL, double sepalW, double petalL,double petalW, String name) {
-		this.sepalLength = sepalL;
-		this.sepalWidth = sepalW;
-		this.petalLength = petalL;
-		this.petalWidth = petalW;
+		this.measure[0] = sepalL;
+		this.measure[1] = sepalW;
+		this.measure[2] = petalL;
+		this.measure[3] = petalW;
+		this.setName(name);
+	}
+	
+	/**
+	 * @return measure
+	 */
+	public double[] getMeasure() {
+		return this.measure;
+		
+	}
+	/**
+	 * @return name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name
+	 */
+	public void setName(String name) {
 		this.name = name;
 	}
 
