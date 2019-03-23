@@ -3,8 +3,10 @@ package part1;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
+
 
 /**
  * @author Karu Skipper
@@ -55,6 +57,7 @@ public class KNN {
 	 */
 	
 	private void arguments(String training, String test) throws FileNotFoundException {
+		double correct = 0;
 		this.testingList = load(new File(test));
 		this.trainingList = load(new File(training));
 		
@@ -62,15 +65,53 @@ public class KNN {
 			Flower[] neighbours = getNeighbours(testingList.get(i), k);
 			String result = getResponses(neighbours);
 			this.predictionList.add(result);
+			if(result.equals(((Flower) testingList.get(i)).getName()))
+				correct++;
+			System.out.println("predicted: " + result + " | actual: " + ((Flower) testingList.get(i)).getName());
 		}
+		System.out.print("Accuracy: " + 100*correct/testingList.size() + "%");
 	}
 
 	private String getResponses(Flower[] neighbours) {
-		return null;
+		int setosa = 0;
+		int versicolor = 0;
+		int virginica = 0;
+
+		for (int i = 0; i < neighbours.length; i++) {
+			if (neighbours[i].getName().equals("Iris-setosa"))
+				setosa++;
+			if (neighbours[i].getName().equals("Iris-virginica"))
+				virginica++;
+			if (neighbours[i].getName().equals("Iris-versicolor"))
+				versicolor++;
+		}
+
+		if (setosa > versicolor && setosa > virginica) {
+			return "Iris-setosa";
+		} else if (versicolor > setosa && versicolor > virginica) {
+			return "Iris-versicolor";
+		}
+		return "Iris-virginica";
 	}
 
 	private Flower[] getNeighbours(Flower flower, int k) {
-		return null;
+		List<DistanceComparator> distances = new ArrayList<>();
+		double dist;
+		int length = flower.getMeasure().length - 1;
+
+		for (int i = 0; i < trainingList.size(); i++) {
+			dist = EuclideanDistance(flower, (Flower) trainingList.get(i), length);
+			distances.add(new DistanceComparator((Flower) trainingList.get(i), dist));
+		}
+		
+		Collections.sort(distances);
+		Flower[] neighbours = new Flower[k];
+
+		for (int i = 0; i < k; i++) 
+			neighbours[i] = distances.get(i).getFlower();
+		
+
+		return neighbours;
 	}
 
 	/**
