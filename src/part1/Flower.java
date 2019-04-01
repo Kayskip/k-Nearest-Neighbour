@@ -5,10 +5,6 @@ package part1;
  * Student ID:300417869
  */
 
-/**
- * @author karu
- *
- */
 public class Flower {
 	
 	/* There are four numeric attributes: sepal length in cm, sepal
@@ -45,7 +41,6 @@ public class Flower {
 	 */
 	public double[] getMeasure() {
 		return this.measure;
-		
 	}
 	/**
 	 * @return name

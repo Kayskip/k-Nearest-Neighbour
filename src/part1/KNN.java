@@ -57,51 +57,68 @@ public class KNN {
 	 */
 	
 	private void arguments(String training, String test) throws FileNotFoundException {
-		double correct = 0;
+		double correctCount = 0;
 		this.testingList = load(new File(test));
 		this.trainingList = load(new File(training));
 		
 		for (int i = 0; i < testingList.size(); i++) {
 			Flower[] neighbours = getNeighbours(testingList.get(i), k);
-			String result = getResponses(neighbours);
-			this.predictionList.add(result);
-			if(result.equals(((Flower) testingList.get(i)).getName()))
-				correct++;
-			System.out.println("predicted: " + result + " | actual: " + ((Flower) testingList.get(i)).getName());
+			String predictionResult = getResponses(neighbours);
+			this.predictionList.add(predictionResult);
+			
+			String actualResult = testingList.get(i).getName();
+			if(predictionResult.equals(actualResult))
+				correctCount++;
+			
+			System.out.println("Predicted: " + predictionResult + " || Actual: " + ((Flower) testingList.get(i)).getName());
 		}
-		System.out.print("Accuracy: " + 100*correct/testingList.size() + "%");
+		System.out.println("Accuracy: " + 100*correctCount/testingList.size() + "%");
+		System.out.println("With a k value of: "+k);
 	}
 
+	/**
+	 * @param neighbours
+	 * @return correct flower depending on the neighbours count
+	 */
 	private String getResponses(Flower[] neighbours) {
-		int setosa = 0;
-		int versicolor = 0;
-		int virginica = 0;
+		int versicolorCount = 0;
+		int virginicaCount = 0;
+		int setosaCount = 0;
 
 		for (int i = 0; i < neighbours.length; i++) {
-			if (neighbours[i].getName().equals("Iris-setosa"))
-				setosa++;
-			if (neighbours[i].getName().equals("Iris-virginica"))
-				virginica++;
-			if (neighbours[i].getName().equals("Iris-versicolor"))
-				versicolor++;
+			if (neighbours[i].getName().equals("Iris-virginica")){
+				virginicaCount++;
+			} else if (neighbours[i].getName().equals("Iris-setosa")){
+				setosaCount++;
+			} else if (neighbours[i].getName().equals("Iris-versicolor")){
+				versicolorCount++;
+			}	
 		}
-
-		if (setosa > versicolor && setosa > virginica) {
-			return "Iris-setosa";
-		} else if (versicolor > setosa && versicolor > virginica) {
+		
+		if (versicolorCount > setosaCount && versicolorCount > virginicaCount) {
 			return "Iris-versicolor";
+		} else if (setosaCount > versicolorCount && setosaCount > virginicaCount) {
+			return "Iris-setosa";
 		}
 		return "Iris-virginica";
 	}
 
+	/**
+	 * @param flower
+	 * @param k
+	 * @return list of nearby neighbours
+	 * compares and gets the closest neighbours to the flower using the euclidean distance
+	 * 
+	 */
 	private Flower[] getNeighbours(Flower flower, int k) {
 		List<DistanceComparator> distances = new ArrayList<>();
-		double dist;
+		double dist = 0;
 		int length = flower.getMeasure().length - 1;
 
 		for (int i = 0; i < trainingList.size(); i++) {
-			dist = EuclideanDistance(flower, (Flower) trainingList.get(i), length);
-			distances.add(new DistanceComparator((Flower) trainingList.get(i), dist));
+			Flower compareFlower = trainingList.get(i);
+			dist = EuclideanDistance(flower, compareFlower, length);
+			distances.add(new DistanceComparator(compareFlower, dist));
 		}
 		
 		Collections.sort(distances);
@@ -109,7 +126,6 @@ public class KNN {
 
 		for (int i = 0; i < k; i++) 
 			neighbours[i] = distances.get(i).getFlower();
-		
 
 		return neighbours;
 	}
